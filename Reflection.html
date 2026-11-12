@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="The Rock I Keep Walking Around: a reflection journal on The Obstacle in Our Path.">
+<title>The Rock I Keep Walking Around</title>
+<style>
+  /* ---------- Base (dark is default; body.light overrides) ---------- */
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: #0c1110;
+    color: #e2ebe7;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  .glow {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at 20% 0%, rgba(126,224,161,0.13), rgba(126,224,161,0) 55%);
+  }
+  .page { position: relative; z-index: 1; padding-top: 16px; }
+
+  /* ---------- Road progress: the reader walks, the rock gets cleared at the midpoint ---------- */
+  .road { position: fixed; top: 0; left: 0; right: 0; height: 16px; z-index: 40; background: #0c1110; border-bottom: 1px solid #22302c; }
+  .road-line { position: absolute; left: 0; right: 0; top: 7px; height: 2px; background: #22302c; }
+  .road-fill { position: absolute; left: 0; top: 7px; height: 2px; width: 0; background: #7ee0a1; }
+  .runner {
+    position: absolute; top: 4px; left: 0; width: 8px; height: 8px; margin-left: -4px;
+    border-radius: 50%; background: #e8b86a;
+  }
+  .rock {
+    position: absolute; top: 2px; left: 50%; width: 14px; height: 11px; margin-left: -7px;
+    border-radius: 6px 7px 5px 6px; background: #8da39b;
+    -webkit-transition: -webkit-transform 0.5s, opacity 0.5s; transition: transform 0.5s, opacity 0.5s;
+  }
+  .rock.cleared { -webkit-transform: translateY(-16px); transform: translateY(-16px); opacity: 0.2; }
+
+  /* ---------- Top bar ---------- */
+  .topbar { position: sticky; top: 16px; z-index: 30; background: rgba(12,17,16,0.93); border-bottom: 1px solid #22302c; }
+  .topbar-in {
+    max-width: 720px; margin: 0 auto; padding: 9px 16px;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  }
+  .brand { font-family: "Courier New", Courier, monospace; font-size: 13px; color: #8da39b; margin: 3px 12px 3px 0; }
+  .brand b { color: #7ee0a1; margin-right: 6px; }
+  .tools { display: flex; align-items: center; margin: 3px 0; }
+  .pct { font-family: "Courier New", Courier, monospace; font-size: 12px; color: #8da39b; min-width: 40px; text-align: right; margin-right: 10px; }
+  .btn {
+    -webkit-appearance: none; appearance: none;
+    font-family: "Courier New", Courier, monospace; font-size: 12px;
+    background: transparent; color: #e2ebe7;
+    border: 1px solid #30433d; border-radius: 4px;
+    padding: 6px 10px; margin-left: 6px; cursor: pointer;
+  }
+  .btn:hover { border-color: #7ee0a1; color: #7ee0a1; }
+  .btn:focus { outline: 2px solid #7ee0a1; outline-offset: 2px; }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 48px 0 30px 0; }
+  .eyebrow {
+    font-family: "Courier New", Courier, monospace; font-size: 12px; letter-spacing: 2px;
+    text-transform: uppercase; color: #7ee0a1; margin: 0 0 14px 0;
+  }
+  h1 {
+    font-family: "Trebuchet MS", "Segoe UI", Roboto, Arial, sans-serif;
+    font-weight: 700; font-size: 38px; line-height: 1.08; letter-spacing: -1px; margin: 0 0 16px 0;
+  }
+  .lede { font-size: 17px; color: #8da39b; margin: 0 0 22px 0; max-width: 36em; }
+  .lede em { color: #e2ebe7; font-style: normal; }
+  .chips { margin: 0 0 26px 0; padding: 0; list-style: none; }
+  .chips li {
+    display: inline-block; margin: 0 8px 8px 0; padding: 4px 10px;
+    border: 1px solid #22302c; background: #121a18; border-radius: 4px;
+    font-family: "Courier New", Courier, monospace; font-size: 12px; color: #8da39b;
+  }
+
+  /* ---------- Requirement check ---------- */
+  .panel { background: #121a18; border: 1px solid #22302c; border-radius: 8px; overflow: hidden; }
+  .panel-head {
+    padding: 9px 14px; background: #16211e; border-bottom: 1px solid #22302c;
+    font-family: "Courier New", Courier, monospace; font-size: 12px; letter-spacing: 1px; color: #8da39b;
+  }
+  .panel-head b { color: #7ee0a1; }
+  .panel-body { padding: 14px 14px 12px 14px; }
+  .count-line { font-family: "Courier New", Courier, monospace; font-size: 13px; color: #8da39b; margin: 0 0 16px 0; }
+  .count-line strong { font-size: 28px; color: #e8b86a; margin-right: 6px; }
+  .gauge { position: relative; height: 10px; background: #22302c; border-radius: 5px; margin: 0 0 8px 0; }
+  .zone { position: absolute; top: 0; bottom: 0; left: 62.5%; width: 25%; background: rgba(126,224,161,0.45); }
+  .mark {
+    position: absolute; top: -5px; width: 4px; height: 20px; margin-left: -2px; left: 0;
+    background: #e8b86a; border-radius: 2px;
+    -webkit-transition: left 0.8s; transition: left 0.8s;
+  }
+  .scale { position: relative; height: 18px; margin: 0 0 14px 0; font-family: "Courier New", Courier, monospace; font-size: 11px; color: #8da39b; }
+  .scale span { position: absolute; top: 0; }
+  .status { font-family: "Courier New", Courier, monospace; font-size: 13px; color: #7ee0a1; margin: 0 0 12px 0; }
+  .tag {
+    display: inline-block; margin: 2px 6px 4px 0; padding: 2px 10px;
+    border: 1px solid #30433d; border-radius: 999px;
+    font-family: "Courier New", Courier, monospace; font-size: 12px; color: #e2ebe7;
+  }
+  .tag.ok { border-color: #7ee0a1; color: #7ee0a1; }
+
+  /* ---------- Journal entry ---------- */
+  .entry { font-size: 19px; padding: 14px 0 8px 0; }
+  .entry p.jp {
+    font-family: Georgia, "Times New Roman", serif; font-size: 1em; line-height: 1.85;
+    margin: 0 0 20px 0; color: #e2ebe7;
+  }
+  .sec {
+    font-family: "Courier New", Courier, monospace; font-size: 13px; letter-spacing: 1px;
+    color: #7ee0a1; border-top: 1px solid #22302c; padding-top: 14px; margin: 38px 0 16px 0;
+  }
+  .sec.first { margin-top: 18px; }
+  .sub {
+    font-family: "Courier New", Courier, monospace; font-size: 12px; letter-spacing: 1px;
+    text-transform: uppercase; color: #e8b86a; margin: 26px 0 10px 0;
+  }
+  .quote { margin: 8px 0 8px 0; padding: 20px 0 6px 0; border-top: 1px solid #30433d; }
+  .quote-label { font-family: "Courier New", Courier, monospace; font-size: 12px; color: #8da39b; margin: 0 0 10px 0; }
+  .quote-text {
+    font-family: "Trebuchet MS", "Segoe UI", Roboto, Arial, sans-serif; font-weight: 700;
+    font-size: 1.25em; line-height: 1.4; color: #e8b86a; margin: 0 0 14px 0;
+  }
+  .eof { font-family: "Courier New", Courier, monospace; font-size: 12px; color: #8da39b; border-top: 1px solid #22302c; padding-top: 14px; margin: 30px 0 0 0; }
+  .after { margin: 14px 0 0 0; }
+  .after .btn { margin-left: 0; margin-right: 8px; margin-bottom: 8px; }
+  .note { font-family: "Courier New", Courier, monospace; font-size: 12px; color: #8da39b; }
+
+  .source { margin: 40px 0 0 0; }
+  .source p { margin: 0; padding: 14px; font-size: 15px; color: #8da39b; }
+  .source p strong { color: #e2ebe7; font-weight: 600; }
+
+  footer {
+    max-width: 720px; margin: 40px auto 0 auto; padding: 18px 16px 48px 16px; border-top: 1px solid #22302c;
+    font-family: "Courier New", Courier, monospace; font-size: 12px; color: #8da39b;
+  }
+  footer span { display: block; margin-bottom: 4px; }
+
+  @media (min-width: 640px) {
+    .hero { padding-top: 64px; }
+    h1 { font-size: 58px; }
+  }
+
+  /* ---------- Light theme ---------- */
+  body.light { background: #f2f5f3; color: #12201b; }
+  .light .glow { background: radial-gradient(ellipse at 20% 0%, rgba(23,121,74,0.11), rgba(23,121,74,0) 55%); }
+  .light .road { background: #f2f5f3; border-bottom-color: #d3ddd8; }
+  .light .road-line { background: #d3ddd8; }
+  .light .road-fill { background: #17794a; }
+  .light .runner { background: #9a6200; }
+  .light .rock { background: #6d837a; }
+  .light .topbar { background: rgba(242,245,243,0.94); border-bottom-color: #d3ddd8; }
+  .light .brand, .light .pct, .light .lede, .light .count-line, .light .scale, .light .panel-head,
+  .light .quote-label, .light .eof, .light .note, .light footer, .light .source p, .light .chips li { color: #4d635a; }
+  .light .brand b, .light .eyebrow, .light .sec, .light .panel-head b, .light .status { color: #17794a; }
+  .light .lede em, .light .source p strong { color: #12201b; }
+  .light .btn { color: #12201b; border-color: #b9c8c0; }
+  .light .btn:hover { color: #17794a; border-color: #17794a; }
+  .light .btn:focus { outline-color: #17794a; }
+  .light .panel, .light .chips li { background: #ffffff; border-color: #d3ddd8; }
+  .light .panel-head { background: #e8efeb; border-bottom-color: #d3ddd8; }
+  .light .gauge { background: #d3ddd8; }
+  .light .zone { background: rgba(23,121,74,0.35); }
+  .light .mark { background: #9a6200; }
+  .light .count-line strong, .light .sub, .light .quote-text { color: #9a6200; }
+  .light .tag { color: #12201b; border-color: #b9c8c0; }
+  .light .tag.ok { color: #17794a; border-color: #17794a; }
+  .light .entry p.jp { color: #17261f; }
+  .light .sec, .light .eof, .light footer, .light .quote { border-color: #d3ddd8; }
+  .light .sec { color: #17794a; }
+  .light .quote { border-top-color: #b9c8c0; }
+</style>
+</head>
+<body>
+
+<div class="glow"></div>
+<div class="road" aria-hidden="true">
+  <div class="road-line"></div>
+  <div class="road-fill" id="roadFill"></div>
+  <div class="rock" id="rock"></div>
+  <div class="runner" id="runner"></div>
+</div>
+
+<div class="page">
+
+  <header class="topbar">
+    <div class="topbar-in">
+      <div class="brand"><b>&gt;</b>reflection_journal.md</div>
+      <div class="tools">
+        <span class="pct" id="pct">0%</span>
+        <button class="btn" id="sizeDown" type="button" aria-label="Smaller text">A-</button>
+        <button class="btn" id="sizeUp" type="button" aria-label="Larger text">A+</button>
+        <button class="btn" id="themeBtn" type="button" aria-label="Switch theme">Light</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section class="hero">
+      <p class="eyebrow">// reflection journal</p>
+      <h1 id="sec-title">The Rock I Keep Walking Around</h1>
+      <p class="lede">A response to <em>&ldquo;The Obstacle in Our Path,&rdquo;</em> and to the habit of complaining about problems instead of moving them.</p>
+      <ul class="chips">
+        <li>Grade 12</li>
+        <li>21st Century Literature</li>
+        <li>Individual Performance Task</li>
+      </ul>
+
+      <div class="panel">
+        <div class="panel-head"><b>$</b> check --requirements</div>
+        <div class="panel-body">
+          <p class="count-line"><strong id="wNum">588</strong>words &middot; <span id="wTime">3</span> min read</p>
+          <div class="gauge"><div class="zone"></div><div class="mark" id="gMark"></div></div>
+          <div class="scale">
+            <span style="left:0">0</span>
+            <span style="left:62.5%; margin-left:-12px">500</span>
+            <span style="left:87.5%; margin-left:-12px">700</span>
+            <span style="right:0">800</span>
+          </div>
+          <p class="status" id="wStatus">Required length: 500 to 700 words</p>
+          <div id="fmtTags">
+            <span class="tag" data-need="sec-title">Title</span>
+            <span class="tag" data-need="sec-intro">Introduction</span>
+            <span class="tag" data-need="sec-body">Body</span>
+            <span class="tag" data-need="sec-conclusion">Conclusion</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <article class="entry" id="entry">
+
+      <div class="sec first" id="sec-intro">## Introduction</div>
+      <p class="jp">When I first read &ldquo;The Obstacle in Our Path,&rdquo; I thought it was a simple story about a king, a boulder, and a farmer. The more I thought about it, the more it felt like a mirror. The merchants and officials in the story did not fail because the rock was too heavy. They failed because they decided it was somebody else&rsquo;s problem. The farmer decided it was his. That small difference is what this reflection is about, and it is a difference I need to learn to make in my own life.</p>
+
+      <div class="sec" id="sec-body">## Body</div>
+
+      <div class="sub">### The message</div>
+      <p class="jp">The central message of the story is that every obstacle is a chance to improve ourselves and help others, and that the reward belongs to those who choose action over complaint. What stayed with me is that the king never pretended the road was fair. The boulder was truly in the way, and the farmer was just as tired as everyone else who walked by. The story does not say that problems are small. It says that our response is a choice. Responsibility, perseverance, and selflessness stood out to me, especially because the farmer was not looking for a prize. He cleared the road because it needed clearing. The gold was a surprise, not the goal.</p>
+
+      <div class="sub">### My connection</div>
+      <p class="jp">This story connects to my life more than I like to admit. As a Grade 12 student, my boulders are deadlines, difficult subjects, and the pressure of deciding what comes after graduation. Too often, I have behaved like the merchants. I complain in the group chat that a project is too much. I scroll on my phone when I should be reviewing. I tell myself I will start tomorrow. Complaining feels like progress for a moment, the same way a reaction on a post feels like helping, but the work is still sitting in the middle of the road. I even wrote a short story of my own, &ldquo;Beyond the Screen,&rdquo; about a boy who finally puts down his phone to help a neighbor clear a clogged canal. While writing it, I realized I was writing about myself.</p>
+
+      <div class="sub">### What I realized</div>
+      <p class="jp">The character who inspired me most is the farmer, because he had every excuse to walk around the rock. He was carrying vegetables, he was probably tired, and he was not the one who put it there. Yet he set down his basket and pushed. That image taught me that courage is often quiet. It does not look like a speech. It looks like one person kneeling in the dirt and doing the work. I also noticed that his effort helped everyone who traveled that road after him, including people he would never meet. That made me think about how my own effort at school, at home, and in my community can become a gift to someone else, even when no one is watching.</p>
+
+      <div class="sec" id="sec-conclusion">## Conclusion</div>
+      <p class="jp">In the end, I learned that obstacles are not signs that I am on the wrong road. They are part of the road. The strengths I can rely on are patience, my habit of finishing what I start once I finally begin, and the support of my family. From now on, when I feel the urge to complain, I want to ask myself one question first: what is one thing I can do about this right now? I hope to become a person who moves the rock instead of walking around it, and who makes the road easier for the next person. If I could write one sentence to encourage my future self, it would be this:</p>
+
+      <div class="quote">
+        <p class="quote-label">// note to my future self</p>
+        <p class="quote-text">Do the hard thing first, and help someone along the way.</p>
+      </div>
+
+      <div class="eof">-- END OF ENTRY --</div>
+    </article>
+
+    <div class="after">
+      <button class="btn" id="copyBtn" type="button">Copy journal text</button>
+      <span class="note" id="copyNote"></span>
+    </div>
+
+    <section class="panel source">
+      <div class="panel-head"><b>$</b> cat source.txt</div>
+      <p><strong>Literary work:</strong> &ldquo;The Obstacle in Our Path,&rdquo; adapted from a traditional inspirational story often attributed to ancient wisdom traditions. <strong>Theme:</strong> challenges become opportunities for growth. <strong>Values:</strong> responsibility, perseverance, initiative, selflessness, service to others.</p>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>Datamex College of Saint Adeline</span>
+    <span>21st Century Literature from the Philippines and the World &middot; Grade 12</span>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  var doc = document;
+  var body = doc.body;
+
+  function byId(id) { return doc.getElementById(id); }
+  function save(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+  function load(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+
+  var entry = byId('entry');
+
+  /* ---------- Journal text and live requirement check ---------- */
+  function paragraphs() {
+    var out = [];
+    var nodes = entry.querySelectorAll('p.jp');
+    for (var i = 0; i < nodes.length; i++) {
+      out.push(nodes[i].textContent.replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, ''));
+    }
+    return out;
+  }
+  function checkRequirements() {
+    var text = paragraphs().join(' ');
+    var words = (text.match(/\S+/g) || []).length;
+    var mins = Math.max(1, Math.round(words / 200));
+    byId('wNum').textContent = words;
+    byId('wTime').textContent = mins;
+
+    var status = byId('wStatus');
+    if (words >= 500 && words <= 700) { status.textContent = 'Within the required 500 to 700 words'; }
+    else if (words < 500) { status.textContent = (500 - words) + ' words short of the 500 minimum'; }
+    else { status.textContent = (words - 700) + ' words over the 700 maximum'; }
+
+    var pos = Math.min(100, (words / 800) * 100);
+    window.setTimeout(function () { byId('gMark').style.left = pos + '%'; }, 150);
+
+    var tags = byId('fmtTags').querySelectorAll('.tag');
+    for (var i = 0; i < tags.length; i++) {
+      var need = tags[i].getAttribute('data-need');
+      if (byId(need)) {
+        tags[i].className = 'tag ok';
+        if (tags[i].textContent.indexOf('✓') !== 0) { tags[i].textContent = '✓ ' + tags[i].textContent; }
+      }
+    }
+  }
+
+  /* ---------- Reader preferences ---------- */
+  var sizes = [16, 17, 19, 21, 23];
+  var sizeIndex = 2;
+  var savedSize = parseInt(load('rj-size'), 10);
+  if (savedSize >= 0 && savedSize < sizes.length) { sizeIndex = savedSize; }
+  function applySize() {
+    entry.style.fontSize = sizes[sizeIndex] + 'px';
+    save('rj-size', String(sizeIndex));
+    update();
+  }
+  byId('sizeDown').onclick = function () { if (sizeIndex > 0) { sizeIndex--; applySize(); } };
+  byId('sizeUp').onclick = function () { if (sizeIndex < sizes.length - 1) { sizeIndex++; applySize(); } };
+
+  var themeBtn = byId('themeBtn');
+  function applyTheme(t) {
+    if (t === 'light') { body.className = 'light'; themeBtn.textContent = 'Dark'; }
+    else { body.className = ''; themeBtn.textContent = 'Light'; }
+  }
+  var theme = load('rj-theme') === 'light' ? 'light' : 'dark';
+  applyTheme(theme);
+  themeBtn.onclick = function () {
+    theme = (theme === 'light') ? 'dark' : 'light';
+    applyTheme(theme);
+    save('rj-theme', theme);
+  };
+
+  /* ---------- Road progress: the rock is cleared once you pass the midpoint ---------- */
+  var fill = byId('roadFill');
+  var runner = byId('runner');
+  var rock = byId('rock');
+  var pct = byId('pct');
+  var ticking = false;
+  function update() {
+    var de = doc.documentElement;
+    var max = Math.max(de.scrollHeight, body.scrollHeight) - window.innerHeight;
+    var y = window.pageYOffset || de.scrollTop || body.scrollTop || 0;
+    var p = max > 0 ? y / max : 0;
+    if (p < 0) { p = 0; }
+    if (p > 1) { p = 1; }
+    fill.style.width = (p * 100).toFixed(1) + '%';
+    runner.style.left = (p * 100).toFixed(1) + '%';
+    pct.textContent = Math.round(p * 100) + '%';
+    if (p >= 0.5) { if (rock.className.indexOf('cleared') === -1) { rock.className = 'rock cleared'; } }
+    else { rock.className = 'rock'; }
+    ticking = false;
+  }
+  function onScroll() {
+    if (!ticking) {
+      ticking = true;
+      if (window.requestAnimationFrame) { window.requestAnimationFrame(update); }
+      else { window.setTimeout(update, 16); }
+    }
+  }
+  window.addEventListener('scroll', onScroll);
+  window.addEventListener('resize', onScroll);
+
+  /* ---------- Copy journal text ---------- */
+  var copyNote = byId('copyNote');
+  function flash(msg) {
+    copyNote.textContent = msg;
+    window.setTimeout(function () { copyNote.textContent = ''; }, 2500);
+  }
+  function fallbackCopy(text) {
+    var ta = doc.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '0';
+    ta.style.opacity = '0';
+    body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = doc.execCommand('copy'); } catch (e) { ok = false; }
+    body.removeChild(ta);
+    flash(ok ? 'Copied.' : 'Copy blocked. Select the text by hand.');
+  }
+  byId('copyBtn').onclick = function () {
+    var text = byId('sec-title').textContent + '\n\n' + paragraphs().join('\n\n');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        function () { flash('Copied.'); },
+        function () { fallbackCopy(text); }
+      );
+    } else {
+      fallbackCopy(text);
+    }
+  };
+
+  /* ---------- Init ---------- */
+  checkRequirements();
+  applySize();
+  update();
+})();
+</script>
+</body>
+</html>

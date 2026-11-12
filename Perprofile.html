@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Personal Website</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            color: #222;
+        }
+
+        /* Navigation */
+
+        nav {
+            background: #111;
+            padding: 18px;
+            text-align: center;
+        }
+
+        nav h1 {
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        nav a {
+            color: #ccc;
+            text-decoration: none;
+            margin: 0 12px;
+            font-size: 15px;
+        }
+
+        nav a:hover {
+            color: #00aaff;
+        }
+
+        /* Profile */
+
+        .profile {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+        }
+
+        .profile-picture {
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #00aaff;
+            margin-bottom: 20px;
+        }
+
+        .profile h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .profile p {
+            color: #666;
+            font-size: 17px;
+        }
+
+        /* Website Pages */
+
+        .pages {
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .pages h2 {
+            margin-bottom: 30px;
+        }
+
+        .card-container {
+            max-width: 900px;
+            margin: auto;
+
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(200px, 1fr));
+
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px #ddd;
+        }
+
+        .card h3 {
+            margin-bottom: 12px;
+            color: #0088cc;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .card a {
+            display: inline-block;
+            text-decoration: none;
+            background: #0088cc;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 20px;
+        }
+
+        .card a:hover {
+            background: #006699;
+        }
+
+        /* About */
+
+        .about {
+            background: #111;
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+
+        .about p {
+            max-width: 700px;
+            margin: 15px auto;
+            line-height: 1.6;
+            color: #ccc;
+        }
+
+        /* Footer */
+
+        footer {
+            background: #111;
+            color: #aaa;
+            text-align: center;
+            padding: 20px;
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+    <!-- Navigation -->
+
+    <nav>
+
+        <h1>My Personal Website</h1>
+
+        <a href="School.html">School</a>
+
+        <a href="Aboutme.html">About</a>
+
+        <a href="Projects.html">Projects</a>
+
+        <a href="Hobby.html">Hobbies</a>
+
+    </nav>
+
+
+    <!-- Profile Section -->
+
+    <section class="profile">
+
+        <!-- PUT YOUR PICTURE HERE -->
+
+        <img src="567980.jpg" alt="Proflie picture" width="150" />
+
+
+        <h2>Muhammad-nur M.Zacaria</h2>
+
+        <p>
+            Student | Beginner Web Developer
+        </p>
+
+    </section>
+
+
+    <!-- Other Webpages -->
+
+    <section class="pages">
+
+        <h2>Explore My Website</h2>
+
+
+        <div class="card-container">
+
+
+            <!-- About -->
+
+            <div class="card">
+
+                <h3>About Me</h3>
+
+                <p>
+                    Learn more about me,
+                    my background, and my interests.
+                </p>
+
+                <a href="Aboutme.html">
+                    View Page
+                </a>
+
+            </div>
+
+
+            
+            <!-- Hobbies -->
+
+            <div class="card">
+
+                <h3>My Hobbies</h3>
+
+                <p>
+                    Learn about the things
+                    I enjoy doing in my free time.
+                </p>
+
+                <a href="Hobby.html">
+                    View Page
+                </a>
+
+            </div>
+
+
+            <!-- Add another webpage -->
+
+            <div class="card">
+
+                <h3>My School</h3>
+
+                <p>
+                    Information about my school
+                    and my student life.
+                </p>
+
+                <a href="School.html">
+                    View Page
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- About Section -->
+
+    <section class="about">
+
+        <h2>Welcome!</h2>
+
+        <p>
+            Welcome to my personal website.
+            This website contains information about me,
+            my projects, hobbies, and other things
+            I want to share.
+        </p>
+
+    </section>
+
+
+    <!-- Footer -->
+
+    <footer>
+
+        <p>
+            © 2026 Your Name | My Personal Website
+        </p>
+
+    </footer>
+
+
+</body>
+</html>

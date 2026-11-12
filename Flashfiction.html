@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Beyond the Screen: a flash fiction story about a flooded street, a buzzing phone, and one boy who steps to the other side of the glass.">
+<title>Beyond the Screen</title>
+<style>
+  /* ---------- Base (dark is default; body.light overrides) ---------- */
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: #0a0e14;
+    color: #dbe4ee;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  .mono { font-family: "Courier New", Courier, monospace; }
+
+  /* Scroll-driven atmosphere: cold screen light fades into warm street light */
+  .glow { position: fixed; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; z-index: 0; }
+  .glow-cold {
+    background: radial-gradient(ellipse at 50% 0%, rgba(91,200,255,0.20), rgba(91,200,255,0) 60%);
+    opacity: 1;
+  }
+  .glow-warm {
+    background: radial-gradient(ellipse at 50% 100%, rgba(255,180,84,0.20), rgba(255,180,84,0) 60%);
+    opacity: 0;
+  }
+  .page { position: relative; z-index: 1; }
+
+  .progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0;
+    background: linear-gradient(90deg, #5bc8ff, #ffb454);
+    z-index: 30;
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(10,14,20,0.92);
+    border-bottom: 1px solid #1f2a3a;
+  }
+  .topbar-in {
+    max-width: 720px; margin: 0 auto;
+    padding: 9px 16px;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  }
+  .brand {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 13px; color: #8aa0b4;
+    margin: 3px 12px 3px 0;
+  }
+  .brand b { color: #5bc8ff; font-weight: 700; margin-right: 6px; }
+  .tools { display: flex; align-items: center; margin: 3px 0; }
+  .pct {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 12px; color: #8aa0b4;
+    min-width: 40px; text-align: right; margin-right: 10px;
+  }
+  .btn {
+    -webkit-appearance: none; appearance: none;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 12px;
+    background: transparent;
+    color: #dbe4ee;
+    border: 1px solid #2a3a4e;
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin-left: 6px;
+    cursor: pointer;
+  }
+  .btn:hover { border-color: #5bc8ff; color: #5bc8ff; }
+  .btn:focus { outline: 2px solid #5bc8ff; outline-offset: 2px; }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 52px 0 36px 0; }
+  .eyebrow {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    color: #5bc8ff; margin: 0 0 14px 0;
+  }
+  h1 {
+    font-family: "Trebuchet MS", "Segoe UI", Roboto, Arial, sans-serif;
+    font-weight: 700; font-size: 42px; line-height: 1.04; letter-spacing: -1px;
+    margin: 0 0 18px 0;
+  }
+  .cursor {
+    display: inline-block; width: 10px; height: 34px; margin-left: 6px;
+    background: #5bc8ff; vertical-align: -3px;
+    -webkit-animation: blink 1.1s steps(1) infinite; animation: blink 1.1s steps(1) infinite;
+  }
+  @-webkit-keyframes blink { 50% { opacity: 0; } }
+  @keyframes blink { 50% { opacity: 0; } }
+  .lede { font-size: 18px; color: #8aa0b4; margin: 0 0 28px 0; max-width: 34em; }
+
+  .code {
+    background: #0f1620; border: 1px solid #1f2a3a; border-radius: 8px;
+    margin: 0 0 28px 0; overflow: hidden;
+  }
+  .code-head {
+    padding: 8px 14px; background: #131c29; border-bottom: 1px solid #1f2a3a;
+    font-family: "Courier New", Courier, monospace; font-size: 12px; color: #8aa0b4;
+  }
+  .code pre {
+    margin: 0; padding: 14px; overflow-x: auto;
+    font-family: "Courier New", Courier, monospace; font-size: 13px; line-height: 1.8;
+    color: #dbe4ee;
+  }
+  .k { color: #5bc8ff; }
+  .s { color: #ffb454; }
+  .n { color: #8be0a0; }
+  .p { color: #8aa0b4; }
+
+  .cta {
+    display: inline-block; text-decoration: none;
+    font-family: "Courier New", Courier, monospace; font-weight: 700; font-size: 14px;
+    background: #5bc8ff; color: #04202e;
+    padding: 12px 18px; border-radius: 6px;
+  }
+  .cta:hover { background: #86d8ff; }
+  .cta:focus { outline: 2px solid #ffb454; outline-offset: 3px; }
+
+  /* ---------- Story ---------- */
+  .story { font-size: 19px; padding: 8px 0 8px 0; }
+  .story p {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1em; line-height: 1.85; margin: 0 0 20px 0; color: #dbe4ee;
+  }
+  .story p.tr {
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 0.78em; line-height: 1.5; color: #8aa0b4; font-style: italic;
+    margin: -10px 0 22px 0;
+  }
+  .ts {
+    font-family: "Courier New", Courier, monospace; font-size: 12px;
+    letter-spacing: 2px; text-transform: uppercase; color: #8aa0b4;
+    border-top: 1px solid #1f2a3a; padding-top: 12px; margin: 40px 0 18px 0;
+  }
+  .ts:first-child { margin-top: 0; }
+  .clock { color: #ffb454; font-weight: 700; margin-right: 10px; }
+
+  .chat {
+    background: #0f1620; border: 1px solid #1f2a3a; border-radius: 10px;
+    padding: 12px 12px 4px 12px; margin: 0 0 24px 0;
+    font-size: 0.82em;
+  }
+  .chat-head {
+    font-family: "Courier New", Courier, monospace; font-size: 11px;
+    letter-spacing: 1px; text-transform: uppercase; color: #8aa0b4;
+    margin: 0 0 10px 0;
+  }
+  .msg {
+    background: #172233; border-radius: 12px 12px 12px 2px;
+    padding: 8px 12px; margin: 0 0 8px 0; max-width: 94%;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.45;
+  }
+  .who {
+    display: block; font-family: "Courier New", Courier, monospace;
+    font-size: 11px; color: #5bc8ff; margin-bottom: 2px;
+  }
+  .msg-text { display: block; }
+  .msg .tr-in { display: block; font-size: 0.85em; color: #8aa0b4; font-style: italic; margin-top: 3px; }
+
+  .eof {
+    font-family: "Courier New", Courier, monospace; font-size: 12px; color: #8aa0b4;
+    border-top: 1px solid #1f2a3a; padding-top: 14px; margin: 36px 0 0 0;
+  }
+  .after { margin: 14px 0 0 0; }
+  .after .btn { margin-left: 0; margin-right: 8px; margin-bottom: 8px; }
+  .note { font-family: "Courier New", Courier, monospace; font-size: 12px; color: #8aa0b4; }
+
+  /* ---------- Panels ---------- */
+  .panel {
+    background: #0f1620; border: 1px solid #1f2a3a; border-radius: 8px;
+    margin: 40px 0 0 0; overflow: hidden;
+  }
+  .panel h2 {
+    margin: 0; padding: 10px 14px; background: #131c29; border-bottom: 1px solid #1f2a3a;
+    font-family: "Courier New", Courier, monospace; font-size: 12px; font-weight: 400;
+    letter-spacing: 1px; color: #8aa0b4;
+  }
+  .panel h2 b { color: #5bc8ff; font-weight: 700; }
+  .rows { margin: 0; padding: 6px 14px 10px 14px; }
+  .row { padding: 10px 0; border-bottom: 1px solid #1a2433; }
+  .row:last-child { border-bottom: 0; }
+  .row dt {
+    font-family: "Courier New", Courier, monospace; font-size: 12px;
+    letter-spacing: 1px; text-transform: uppercase; color: #8aa0b4; margin: 0 0 4px 0;
+  }
+  .row dd { margin: 0; font-size: 15px; }
+  .tag {
+    display: inline-block; margin: 2px 6px 2px 0; padding: 2px 9px;
+    border: 1px solid #2a3a4e; border-radius: 999px;
+    font-family: "Courier New", Courier, monospace; font-size: 12px; color: #dbe4ee;
+  }
+  .gl dt { font-family: Georgia, "Times New Roman", serif; font-size: 16px; font-weight: 700; letter-spacing: 0; text-transform: none; color: #ffb454; }
+
+  footer {
+    max-width: 720px; margin: 40px auto 0 auto; padding: 18px 16px 48px 16px;
+    border-top: 1px solid #1f2a3a;
+    font-family: "Courier New", Courier, monospace; font-size: 12px; color: #8aa0b4;
+  }
+  footer span { display: block; margin-bottom: 4px; }
+
+  @media (min-width: 640px) {
+    .hero { padding-top: 72px; }
+    h1 { font-size: 68px; }
+    .cursor { height: 54px; width: 14px; vertical-align: -5px; }
+    .row { display: flex; }
+    .row dt { width: 120px; margin: 3px 0 0 0; }
+    .row dd { flex: 1; }
+  }
+
+  /* ---------- Light theme ---------- */
+  body.light { background: #f3f6fa; color: #101a26; }
+  .light .glow-cold { background: radial-gradient(ellipse at 50% 0%, rgba(10,106,148,0.13), rgba(10,106,148,0) 60%); }
+  .light .glow-warm { background: radial-gradient(ellipse at 50% 100%, rgba(168,90,0,0.13), rgba(168,90,0,0) 60%); }
+  .light .topbar { background: rgba(243,246,250,0.94); border-bottom-color: #d5dde7; }
+  .light .brand, .light .pct, .light .lede, .light .code-head, .light .p, .light .ts,
+  .light .story p.tr, .light .chat-head, .light .msg .tr-in, .light .eof, .light .note,
+  .light .panel h2, .light .row dt, .light footer { color: #4f6378; }
+  .light .brand b, .light .eyebrow, .light .k, .light .who, .light .panel h2 b { color: #0a6a94; }
+  .light .btn { color: #101a26; border-color: #bccad8; }
+  .light .btn:hover { color: #0a6a94; border-color: #0a6a94; }
+  .light .btn:focus { outline-color: #0a6a94; }
+  .light .cursor { background: #0a6a94; }
+  .light .code, .light .chat, .light .panel { background: #ffffff; border-color: #d5dde7; }
+  .light .code-head, .light .panel h2 { background: #eaf0f6; border-bottom-color: #d5dde7; }
+  .light .code pre { color: #101a26; }
+  .light .s, .light .clock, .light .gl dt { color: #a85a00; }
+  .light .n { color: #1d7a3a; }
+  .light .cta { background: #0a6a94; color: #ffffff; }
+  .light .cta:hover { background: #0d82b3; }
+  .light .story p { color: #16212e; }
+  .light .ts, .light .eof, .light footer, .light .row { border-color: #d5dde7; }
+  .light .msg { background: #e8eff6; }
+  .light .tag { color: #101a26; border-color: #bccad8; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cursor { -webkit-animation: none; animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow glow-cold" id="cold"></div>
+<div class="glow glow-warm" id="warm"></div>
+<div class="progress" id="bar"></div>
+
+<div class="page">
+
+  <header class="topbar">
+    <div class="topbar-in">
+      <div class="brand"><b>&gt;</b>beyond_the_screen.md</div>
+      <div class="tools">
+        <span class="pct" id="pct">0%</span>
+        <button class="btn" id="sizeDown" type="button" aria-label="Smaller text">A-</button>
+        <button class="btn" id="sizeUp" type="button" aria-label="Larger text">A+</button>
+        <button class="btn" id="themeBtn" type="button" aria-label="Switch theme">Light</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <section class="hero">
+      <p class="eyebrow">// flash fiction</p>
+      <h1>Beyond the Screen<span class="cursor"></span></h1>
+      <p class="lede">One flooded street, one buzzing phone, and the moment a boy steps to the other side of the glass.</p>
+
+      <div class="code">
+        <div class="code-head">story.meta.json</div>
+<pre><span class="p">{</span>
+  <span class="k">"title"</span><span class="p">:</span>    <span class="s">"Beyond the Screen"</span><span class="p">,</span>
+  <span class="k">"form"</span><span class="p">:</span>     <span class="s">"flash fiction"</span><span class="p">,</span>
+  <span class="k">"setting"</span><span class="p">:</span>  <span class="s">"Barangay San Isidro, 9:47 p.m."</span><span class="p">,</span>
+  <span class="k">"words"</span><span class="p">:</span>    <span class="n" id="mWords">447</span><span class="p">,</span>
+  <span class="k">"sentences"</span><span class="p">:</span> <span class="n" id="mSent">40</span><span class="p">,</span>
+  <span class="k">"readTime"</span><span class="p">:</span> <span class="s">"<span id="mTime">3</span> min"</span><span class="p">,</span>
+  <span class="k">"theme"</span><span class="p">:</span>    <span class="s">"action over complaint"</span>
+<span class="p">}</span></pre>
+      </div>
+
+      <a class="cta" href="#story">$ step beyond the screen</a>
+    </section>
+
+    <article class="story" id="story">
+
+      <div class="ts"><span class="clock">21:47</span>Indoors</div>
+
+      <p>At 9:47 p.m., the group chat of Barangay San Isidro had 212 unread messages.</p>
+      <p>Miko scrolled through them from his bed, his thumb moving on its own.</p>
+
+      <div class="chat">
+        <div class="chat-head">San Isidro Neighbors &middot; 212 unread</div>
+        <div class="msg"><span class="who">Aling Cora</span><span class="msg-text">Grabe, bahang-baha na naman sa kanto!</span><span class="tr-in">Terrible, the corner is flooded again!</span></div>
+        <div class="msg"><span class="who">Kuya Dindo</span><span class="msg-text">Wala talagang ginagawa ang barangay.</span><span class="tr-in">The barangay really does nothing.</span></div>
+        <div class="msg"><span class="who">Mica R.</span><span class="msg-text">Sino ba ang maglilinis niyan?</span><span class="tr-in">Who is even going to clean that up?</span></div>
+      </div>
+
+      <p>Under the messages sat a photo of the clogged canal at the corner, its black water creeping across the road. Four hundred reactions. Not one person, as far as Miko could tell, had actually gone outside.</p>
+      <p>He typed his own comment, <em>true, sobrang hassle</em>, and watched it collect hearts. For a second, it felt like helping.</p>
+
+      <div class="ts"><span class="clock">22:03</span>The window</div>
+
+      <p>Outside, something scraped against concrete.</p>
+      <p>He pulled back the curtain. Under the streetlight, Aling Rosa, who sold fish balls at the corner and had to be at least seventy, knelt at the canal, pulling plastic bags out of the water with her bare hands. Her cart stood on the dry side of the road, its small bulb flickering.</p>
+      <p>His phone buzzed.</p>
+
+      <div class="chat">
+        <div class="msg"><span class="who">Aling Cora</span><span class="msg-text">Bakit ba walang tumutulong?</span><span class="tr-in">Why is nobody helping?</span></div>
+      </div>
+
+      <p>Miko read it twice. In the dark glass he saw his own face, lit blue, and behind it the real street, wet and waiting. He had been standing on the wrong side of the window.</p>
+      <p>He put the phone face down on the pillow.</p>
+
+      <div class="ts"><span class="clock">22:20</span>Outside</div>
+
+      <p>The air smelled of rain and rust.</p>
+      <p>&ldquo;Aling Rosa, ako na po,&rdquo; he said, kneeling beside her.</p>
+      <p class="tr">Let me do it, please.</p>
+      <p>She squinted up at him. &ldquo;Ikaw pala, iho. Akala ko puro cellphone ka lang.&rdquo;</p>
+      <p class="tr">Oh, it&rsquo;s you, child. I thought you were only about your phone.</p>
+      <p>It stung because it was fair. He laughed anyway and reached for the next bag.</p>
+      <p>The water was cold and the plastic was slimy; his sleeves were soaked within a minute. Ten minutes later, a door opened across the street. Kuya Dindo came down in his slippers with a rake. Then two kids with a dustpan, then Ate Joan in gloves three sizes too big. Nobody mentioned the group chat. They only called out to one another: &ldquo;Dito pa! May barado pa rito!&rdquo;</p>
+      <p class="tr">Over here! There&rsquo;s more stuck over here!</p>
+
+      <div class="ts"><span class="clock">23:00</span>After</div>
+
+      <p>By eleven, the canal gurgled and the water slid away, taking the whole street&rsquo;s complaints with it. They stood in a muddy circle, out of breath, laughing at nothing. Aling Rosa handed out fish balls for free. Miko ate his standing up, steam in his face, and realized he now knew the names of four neighbors he had only known as profile pictures.</p>
+      <p>Upstairs, his phone lit the dark room: 340 unread. Someone had finally written, <em>Sino nag-ayos? Salamat po sa kung sino man.</em></p>
+      <p class="tr">Who fixed it? Thank you, whoever you are.</p>
+      <p>Miko didn&rsquo;t reply. He sat on the curb, hands smelling of rain and canal, watching the street shine under the light. Across the road, Kuya Dindo laughed out loud, the first sound all night that hadn&rsquo;t come through a speaker.</p>
+
+      <div class="eof">-- EOF --</div>
+    </article>
+
+    <div class="after">
+      <button class="btn" id="copyBtn" type="button">Copy story text</button>
+      <span class="note" id="copyNote"></span>
+    </div>
+
+    <section class="panel">
+      <h2><b>$</b> cat story.analysis</h2>
+      <dl class="rows">
+        <div class="row"><dt>Theme</dt><dd>Real connection and real action matter more than online reaction.</dd></div>
+        <div class="row"><dt>Setting</dt><dd>A flooded street in Barangay San Isidro, from 9:47 p.m. to 11:00 p.m. in one night.</dd></div>
+        <div class="row"><dt>Conflict</dt><dd>Person vs. self: Miko&rsquo;s habit of watching life through a screen. Person vs. nature: a clogged canal and rising water.</dd></div>
+        <div class="row"><dt>Symbols</dt><dd>The window glass is the line between watching and doing. The canal is the obstacle that only shared effort can clear. The fish balls are community, given freely.</dd></div>
+        <div class="row"><dt>Values</dt><dd><span class="tag">initiative</span><span class="tag">responsibility</span><span class="tag">service</span><span class="tag">humility</span><span class="tag">bayanihan</span></dd></div>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <h2><b>$</b> man glossary</h2>
+      <dl class="rows gl">
+        <div class="row"><dt>Barangay</dt><dd>The smallest local government unit in the Philippines; also used for one&rsquo;s neighborhood.</dd></div>
+        <div class="row"><dt>Aling</dt><dd>A respectful title placed before the name of an older woman.</dd></div>
+        <div class="row"><dt>Kuya / Ate</dt><dd>Older brother / older sister; also used to address older men and women politely.</dd></div>
+        <div class="row"><dt>Iho</dt><dd>A fond word for a young man or child.</dd></div>
+        <div class="row"><dt>Po</dt><dd>A small word added to a sentence to show respect.</dd></div>
+        <div class="row"><dt>Grabe</dt><dd>An exclamation like &ldquo;wow&rdquo; or &ldquo;that&rsquo;s terrible.&rdquo;</dd></div>
+        <div class="row"><dt>Fish balls</dt><dd>A popular street food sold from small carts.</dd></div>
+      </dl>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>Datamex College of Saint Adeline</span>
+    <span>21st Century Literature from the Philippines and the World &middot; Grade 12</span>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  var doc = document;
+  var body = doc.body;
+
+  function byId(id) { return doc.getElementById(id); }
+  function save(k, v) { try { window.localStorage.setItem(k, v); } catch (e) {} }
+  function load(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+
+  var story = byId('story');
+  var bar = byId('bar');
+  var cold = byId('cold');
+  var warm = byId('warm');
+  var pct = byId('pct');
+
+  /* ---------- Live story statistics (counts prose and chat text only) ---------- */
+  function collectStoryText() {
+    var parts = [];
+    var nodes = story.querySelectorAll('p, .msg-text');
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i].className.indexOf('tr') === -1) {
+        parts.push(nodes[i].textContent.replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, ''));
+      }
+    }
+    return parts;
+  }
+  function updateStats() {
+    var parts = collectStoryText();
+    var text = parts.join(' ');
+    var words = (text.match(/\S+/g) || []).length;
+    var sentences = (text.match(/[.!?]+(\s|$)/g) || []).length;
+    var mins = Math.max(1, Math.round(words / 200));
+    byId('mWords').textContent = words;
+    byId('mSent').textContent = sentences;
+    byId('mTime').textContent = mins;
+  }
+
+  /* ---------- Reader preferences ---------- */
+  var sizes = [16, 17, 19, 21, 23];
+  var sizeIndex = 2;
+  var savedSize = parseInt(load('bts-size'), 10);
+  if (savedSize >= 0 && savedSize < sizes.length) { sizeIndex = savedSize; }
+
+  function applySize() {
+    story.style.fontSize = sizes[sizeIndex] + 'px';
+    save('bts-size', String(sizeIndex));
+    update();
+  }
+  byId('sizeDown').onclick = function () { if (sizeIndex > 0) { sizeIndex--; applySize(); } };
+  byId('sizeUp').onclick = function () { if (sizeIndex < sizes.length - 1) { sizeIndex++; applySize(); } };
+
+  var themeBtn = byId('themeBtn');
+  function applyTheme(t) {
+    if (t === 'light') {
+      body.className = 'light';
+      themeBtn.textContent = 'Dark';
+    } else {
+      body.className = '';
+      themeBtn.textContent = 'Light';
+    }
+  }
+  var theme = load('bts-theme') === 'light' ? 'light' : 'dark';
+  applyTheme(theme);
+  themeBtn.onclick = function () {
+    theme = (theme === 'light') ? 'dark' : 'light';
+    applyTheme(theme);
+    save('bts-theme', theme);
+  };
+
+  /* ---------- Scroll: progress bar and screen-to-street light shift ---------- */
+  var ticking = false;
+  function update() {
+    var de = doc.documentElement;
+    var max = Math.max(de.scrollHeight, body.scrollHeight) - window.innerHeight;
+    var y = window.pageYOffset || de.scrollTop || body.scrollTop || 0;
+    var p = max > 0 ? y / max : 0;
+    if (p < 0) { p = 0; }
+    if (p > 1) { p = 1; }
+    bar.style.width = (p * 100).toFixed(1) + '%';
+    cold.style.opacity = String(1 - p);
+    warm.style.opacity = String(p);
+    pct.textContent = Math.round(p * 100) + '%';
+    ticking = false;
+  }
+  function onScroll() {
+    if (!ticking) {
+      ticking = true;
+      if (window.requestAnimationFrame) { window.requestAnimationFrame(update); }
+      else { window.setTimeout(update, 16); }
+    }
+  }
+  window.addEventListener('scroll', onScroll);
+  window.addEventListener('resize', onScroll);
+
+  /* ---------- Copy story text ---------- */
+  var copyNote = byId('copyNote');
+  function flash(msg) {
+    copyNote.textContent = msg;
+    window.setTimeout(function () { copyNote.textContent = ''; }, 2500);
+  }
+  function fallbackCopy(text) {
+    var ta = doc.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '0';
+    ta.style.opacity = '0';
+    body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = doc.execCommand('copy'); } catch (e) { ok = false; }
+    body.removeChild(ta);
+    flash(ok ? 'Copied.' : 'Copy blocked. Select the text by hand.');
+  }
+  byId('copyBtn').onclick = function () {
+    var text = 'Beyond the Screen\n\n' + collectStoryText().join('\n\n');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        function () { flash('Copied.'); },
+        function () { fallbackCopy(text); }
+      );
+    } else {
+      fallbackCopy(text);
+    }
+  };
+
+  /* ---------- Init ---------- */
+  updateStats();
+  applySize();
+  update();
+})();
+</script>
+</body>
+</html>
